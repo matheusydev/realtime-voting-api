@@ -1,0 +1,38 @@
+CREATE TABLE usuarios (
+    usuario_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE enquetes (
+    enquetes_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    pergunta VARCHAR(100) NOT NULL,
+    status VARCHAR(1) NOT NULL DEFAULT 'A' CHECK (status IN ('A', 'F', 'C')),
+    data_criacao DATE NOT NULL DEFAULT CURRENT_DATE,
+    votos_total INT NOT NULL DEFAULT 0,
+    usuario_id INT NOT NULL REFERENCES usuarios(usuario_id),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE opcoes_voto (
+    opcoes_voto_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    enquetes_id INT NOT NULL REFERENCES enquetes(enquetes_id),
+    texto TEXT NOT NULL,
+    votos_opcao INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE votos (
+    votos_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    enquetes_id INT NOT NULL REFERENCES enquetes(enquetes_id),
+    opcoes_voto_id INT NOT NULL REFERENCES opcoes_voto(opcoes_voto_id),
+    usuario_id INT NOT NULL REFERENCES usuarios(usuario_id),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_voto_unico UNIQUE (enquetes_id, usuario_id)
+);
